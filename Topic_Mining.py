@@ -1,5 +1,7 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import NMF
+import numpy as np
+import pandas as pd
 
 
 def top_titles_for_latent(W,n_titles,titles):
@@ -14,17 +16,57 @@ def top_words_for_latent(H,n_words,vocal):
         print 'topic: {}, \ntitles:\n{}'.format(i+1,vocal[idx])
 
 
-def fit_nmf(obs_matrix, vocabulary):
+def fit_nmf(obs_matrix,n_topic, vocabulary):
     '''
     Takes in TF-IDF matrix and vocab list
     Decomposes matrix to W & H
     Returns matrices W & H
     '''
-    nmf = NMF(n_components = 5,random_state=42) #5 latent features
+    nmf = NMF(n_components = n_topic,random_state=42) #5 latent features
     W = nmf.fit_transform(obs_matrix)
     H = nmf.components_
     return W,H
 
+def MF(obs,n_topic):
+    vect = TfidfVectorizer(max_features=1000, stop_words='english')
+    obs_matrix = vect.fit_transform(obs).toarray()
+    vocabulary = np.array(vect.get_feature_names())
+    W,H = fit_nmf(obs_matrix,n_topic, vocabulary)
+
+    return W,H,vocabulary
+
+def plot_state_heatmap(df,filename):
+    data = [ dict(
+            type='choropleth',
+            colorscale = scl,
+            autocolorscale = False,
+            locations = df['code'],
+            z = df['Obs'].astype(float),
+            locationmode = 'USA-states',
+            marker = dict(
+                line = dict (
+                    color = 'rgb(255,255,255)',
+                    width = 2
+                )
+            ),
+            colorbar = dict(
+                title = "Sightings Number"
+            )
+        ) ]
+
+    layout = dict(
+            title = 'Bigfoot sightings Heatmap',
+            geo = dict(
+                scope='usa',
+                projection=dict( type='albers usa' ),
+                showlakes = True,
+                lakecolor = 'rgb(255, 255, 255)',
+            ),
+        )
+
+    fig = dict( data=data, layout=layout )
+
+    url = py.plot( fig, filename=filename )
 
 if __name__ == '__main__':
 
