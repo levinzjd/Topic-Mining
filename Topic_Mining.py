@@ -5,6 +5,10 @@ import pandas as pd
 
 
 def top_titles_for_latent(W,n_titles,titles):
+    '''
+    find the most relevant titles for latent features
+    '''
+
     max_idx = np.argsort(W,axis=0)[:-n_titles-1:0-1]
     titles_idx = max_idx.T
     for i,idx in enumerate(titles_idx):
@@ -22,12 +26,15 @@ def fit_nmf(obs_matrix,n_topic, vocabulary):
     Decomposes matrix to W & H
     Returns matrices W & H
     '''
+
     nmf = NMF(n_components = n_topic,random_state=42) #5 latent features
     W = nmf.fit_transform(obs_matrix)
     H = nmf.components_
     return W,H
 
 def MF(obs,n_topic):
+    '''Matrix factorization'''
+
     vect = TfidfVectorizer(max_features=1000, stop_words='english')
     obs_matrix = vect.fit_transform(obs).toarray()
     vocabulary = np.array(vect.get_feature_names())
@@ -36,6 +43,8 @@ def MF(obs,n_topic):
     return W,H,vocabulary
 
 def plot_state_heatmap(df,filename):
+    '''create a state-wise heatmap for bigfoot sightings'''
+
     data = [ dict(
             type='choropleth',
             colorscale = scl,

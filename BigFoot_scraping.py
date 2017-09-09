@@ -5,9 +5,18 @@ import requests
 import matplotlib.pyplot as plt
 import re
 
+'''
+Parse bigfoot sighting reports from json file. The contents of json are html pages.
+'''
 
 
 def parse_one_report(html):
+    '''
+    Parse one report from one html page
+    Input: html page
+    Output: dictionary of one report, title and body of report
+    '''
+
     soup = BeautifulSoup(html,'html.parser')
     # title = [p.text.split(':')[0] for p in soup.find_all('span',class_='field')]
     ps = [p for p in soup.find_all('p')]
@@ -25,12 +34,20 @@ def parse_one_report(html):
 
 
 def parse_all_report(htmls):
+    '''
+    Parse all reports from html pages
+    '''
+
     contents = []
     for html in htmls:
         contents.append(parse_one_report(html))
     return contents
 
 def parse_column(des,contents):
+    '''
+    retrieve the column information from dictionaries
+    '''
+
     col = []
     for content in contents:
             if des in content.keys():
@@ -40,6 +57,8 @@ def parse_column(des,contents):
     return col
 
 def parse_year(yr):
+    '''retrieve the year information from text'''
+
     res = re.findall('\d+',yr)
     if len(res)>0:
         return res[0]
@@ -47,6 +66,8 @@ def parse_year(yr):
         return -2000
 
 def convert_yr_to_int(df):
+    '''convert years to integers'''
+
     df_ = df.copy()
     df_['Year'] = df_['Year'].apply(parse_year).astype(int)
     df_['Year'][df_['Year']<100] = df_['Year'][df_['Year']<100] + 1900
@@ -54,6 +75,8 @@ def convert_yr_to_int(df):
 
 
 def convert_to_df(contents):
+    '''create a dataframe from the dictionaries'''
+
     observations = parse_column('OBSERVED',contents)
     year = parse_column('YEAR',contents)
     season = parse_column('SEASON',contents)
@@ -84,8 +107,6 @@ if __name__ == '__main__':
             reports.append(json.loads(i))
 
     htmls = [rep['html'] for rep in reports]
-
-
     contents = parse_all_report(htmls)
     clean_contents = [content for content in contents if 'OBSERVED' in content.keys()]
 
