@@ -1,4 +1,4 @@
-# Topic-Mining
+# Topic-Mining-On-Bigfoot-Sightings
 Topic Mining on BigFoot sighting reports. Unsupervised learning on the most relevant events and topics related to Bigfoot sighting reports. Bigfoot sightings have been reported since last 40 years and many of the reports shared some similar descriptions and location information. What is the most relevant events to those sightings?
 
 ## Data
